@@ -1,0 +1,34 @@
+stages:
+  - test
+  - deploy
+
+test-all:
+  stage: test
+  except:
+    - master
+  script:
+    - mvn clean install
+
+test-unit:
+  stage: test
+  only:
+    - master
+  script:
+    - mvn clean package
+    - cp target/gestion_des_impots.jar gestion_des_impots.jar-${CI_COMMIT_SHA}.jar
+artifacts:
+  name: gestion_des_impots
+  expire_in: 1 week
+  paths:
+    -gestion_des_impots.jar-${CI_COMMIT_SHA}.jar
+
+deploy:
+  stage: deploy
+  needs: [test-unit]
+  only:
+    - master
+  script:
+    - ls gestion_des_impots.jar
+
+
+
